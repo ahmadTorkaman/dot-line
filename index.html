@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#241329">
+  <title>Dot Line — Interactive lettering</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #241329; background: #f4f1e7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1160px; margin: auto; padding: 32px 32px 56px; }
+    header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 34px; gap: 20px; }
+    .brand { font-size: 16px; font-weight: 650; letter-spacing: -.035em; }
+    .brand span { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #c2a22d; margin-right: 8px; }
+    .edition { font-size: 12px; color: #6c626b; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0 0 14px; font-size: clamp(38px, 6.2vw, 72px); line-height: 1.05; font-weight: 500; letter-spacing: -.055em; }
+    .intro { max-width: 550px; color: #6a6068; line-height: 1.6; margin: 0 0 30px; font-size: 16px; }
+    .stage { overflow: hidden; background: #241329; border-radius: 4px; padding: clamp(8px, 2vw, 22px); }
+    dot-line { --dot-color: #d3b638; --dot-background: #241329; }
+    .hint { margin: 12px 0 30px; font-size: 12px; color: #6a6068; }
+    .controls { display: flex; align-items: end; gap: 24px; flex-wrap: wrap; }
+    .word { flex: 1 1 270px; }
+    label { display: block; font-size: 12px; margin-bottom: 9px; color: #6a6068; }
+    input[type=text] { display: block; width: 100%; background: transparent; border: 0; border-bottom: 1px solid #cfc9bf; color: #241329; font: inherit; padding: 9px 0 13px; font-size: 22px; border-radius: 0; }
+    input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid #8a6815; outline-offset: 5px; }
+    .presets { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 7px; }
+    button { appearance: none; border: 1px solid #d3cdc4; background: transparent; color: #241329; font: inherit; font-size: 12px; padding: 9px 15px; border-radius: 30px; cursor: pointer; min-height: 40px; }
+    button[aria-pressed=true] { background: #241329; color: #f4f1e7; border-color: #241329; }
+    .settings { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px 24px; margin-top: 26px; }
+    .settings label { grid-column: span 2; margin: 0; }
+    .settings .setting-wide { grid-column: span 3; }
+    .setting-caption { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+    .settings input[type=range] { display: block; width: 100%; min-height: 40px; margin: 0; accent-color: #8a6815; }
+    select { display: block; width: 100%; min-width: 0; background: #f4f1e7; color: #241329; border: 1px solid #cfc9bf; font: inherit; font-size: 14px; padding: 10px; min-height: 40px; border-radius: 4px; margin-top: 9px; }
+    .setting-note { grid-column: 1 / -1; margin: 0; color: #6a6068; font-size: 12px; }
+    .style-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 20px; }
+    .style-presets > span { flex-basis: 100%; font-size: 12px; color: #6a6068; margin-bottom: 3px; }
+    .style-presets #reset { margin-left: auto; border-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
+    .embed { border-top: 1px solid #d9d2c9; margin-top: 44px; padding-top: 24px; display: flex; gap: 24px; align-items: start; justify-content: space-between; flex-wrap: wrap; }
+    .embed h2 { font-size: 15px; font-weight: 500; margin: 0 0 8px; }
+    .embed p { color: #6a6068; font-size: 13px; margin: 0; line-height: 1.6; }
+    pre { max-width: 100%; overflow: auto; background: #ebe6dc; margin: 0; padding: 15px 18px; border-radius: 4px; font-size: 12px; line-height: 1.6; }
+    a { color: inherit; }
+    @media (max-width: 560px) { main { padding: 24px 18px 36px; } header { padding-bottom: 28px; } .controls { gap: 16px; } .presets { padding: 0; } .edition { font-size: 10px; } pre { width: 100%; } .settings { grid-template-columns: 1fr; } .settings label, .settings .setting-wide { grid-column: 1; } .style-presets #reset { margin-left: 0; } }
+    @media (prefers-reduced-motion: reduce) { .hint-motion { display: none; } }
+  </style>
+  <script type="module" src="./dot-line.mjs"></script>
+</head>
+<body>
+  <main>
+    <header><div class="brand"><span aria-hidden="true"></span>Dot Line</div><div class="edition">An interactive type experiment</div></header>
+    <h1>Type that makes room.</h1>
+    <p class="intro">A field of yellow dots, with letters in the spaces between. Move through it and watch the dots find their way home.</p>
+    <div class="stage"><dot-line id="lettering" text="Robot"></dot-line></div>
+    <p class="hint"><span class="hint-motion">Hover to push the dots. On touch screens, press and move. </span>Every dot keeps its own space.</p>
+    <div class="controls">
+      <div class="word"><label for="word">Your text</label><input id="word" type="text" value="Robot" maxlength="40" autocomplete="off" spellcheck="false"></div>
+      <div class="presets" aria-label="Text examples">
+        <button type="button" data-text="Robot" aria-pressed="true">Robot</button>
+        <button type="button" data-text="Hello" aria-pressed="false">Hello</button>
+        <button type="button" data-text="Play" aria-pressed="false">Play</button>
+        <button type="button" id="alphabet" aria-pressed="false">A–Z / a–z</button>
+      </div>
+    </div>
+    <div class="settings">
+      <label class="setting-wide" for="radius"><span class="setting-caption">Dot size <output id="radius-value" for="radius">90%</output></span><input id="radius" type="range" min="0.12" max="0.47" step="0.01" value="0.45" aria-describedby="size-note"></label>
+      <label class="setting-wide" for="strength"><span class="setting-caption">Movement <output id="strength-value" for="strength">70</output></span><input id="strength" type="range" min="0" max="120" step="1" value="70"></label>
+      <label for="connect">Connections<select id="connect"><option value="none">None</option><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></label>
+      <label for="dot-style">Dot style<select id="dot-style"><option value="solid">Solid</option><option value="outline">Outline</option></select></label>
+      <label for="mode">Lettering<select id="mode"><option value="cutout">Letters in the spaces</option><option value="letters">Dots form the letters</option></select></label>
+      <p class="setting-note" id="size-note">Dot size is the diameter as a percentage of the grid spacing.</p>
+    </div>
+    <div class="style-presets" role="group" aria-label="Style presets">
+      <span>Try a style</span>
+      <button type="button" data-style-preset="original" aria-pressed="true">Original</button>
+      <button type="button" data-style-preset="fine" aria-pressed="false">Fine dots</button>
+      <button type="button" data-style-preset="vertical" aria-pressed="false">Vertical</button>
+      <button type="button" data-style-preset="horizontal" aria-pressed="false">Horizontal</button>
+      <button type="button" data-style-preset="outline" aria-pressed="false">Outline</button>
+      <button type="button" data-style-preset="letters" aria-pressed="false">Letter dots</button>
+      <button type="button" id="reset">Reset settings</button>
+    </div>
+    <div class="embed">
+      <div><h2>Put it on your website.</h2><p>Plain JavaScript. Responsive. No dependencies.<br><a href="./README.md">Integration notes</a> · <a href="https://github.com/ahmadTorkaman/dot-line">Open source on GitHub</a> · MIT license</p></div>
+      <pre><code id="integration-code">&lt;script type="module" src="/dot-line/dot-line.mjs"&gt;&lt;/script&gt;
+&lt;dot-line text="Robot"&gt;&lt;/dot-line&gt;</code></pre>
+    </div>
+  </main>
+  <script type="module">
+    const effect = document.getElementById('lettering');
+    const input = document.getElementById('word');
+    const buttons = [...document.querySelectorAll('.presets button')];
+    const code = document.getElementById('integration-code');
+    const baseSnippet = code.textContent;
+    const escapeAttribute = value => String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    const settings = [
+      { name: 'radius', value: '0.45', event: 'input', format: value => `${Math.round(Number(value) * 200)}%` },
+      { name: 'strength', value: '70', event: 'input' },
+      { name: 'connect', value: 'none', event: 'change' },
+      { name: 'dot-style', value: 'solid', event: 'change' },
+      { name: 'mode', value: 'cutout', event: 'change' },
+    ].map(setting => ({ ...setting, input: document.getElementById(setting.name), output: document.getElementById(`${setting.name}-value`) }));
+    const presets = {
+      original: { radius: '0.45', connect: 'none', 'dot-style': 'solid', mode: 'cutout' },
+      fine: { radius: '0.24', connect: 'none', 'dot-style': 'solid', mode: 'cutout' },
+      vertical: { radius: '0.32', connect: 'vertical', 'dot-style': 'solid', mode: 'cutout' },
+      horizontal: { radius: '0.32', connect: 'horizontal', 'dot-style': 'solid', mode: 'cutout' },
+      outline: { radius: '0.4', connect: 'none', 'dot-style': 'outline', mode: 'cutout' },
+      letters: { radius: '0.4', connect: 'none', 'dot-style': 'solid', mode: 'letters' },
+    };
+    const styleButtons = [...document.querySelectorAll('.style-presets [data-style-preset]')];
+    const applied = new Map();
+    let activeText = input.value;
+    const applyAttribute = (name, value) => {
+      if (applied.get(name) === value) return;
+      effect.setAttribute(name, value);
+      applied.set(name, value);
+    };
+    const update = () => {
+      applyAttribute('text', activeText);
+      const attributes = [`text="${escapeAttribute(activeText)}"`];
+      for (const setting of settings) {
+        applyAttribute(setting.name, setting.input.value);
+        if (setting.output) setting.output.textContent = setting.format ? setting.format(setting.input.value) : setting.input.value;
+        if (setting.name === 'radius') setting.input.setAttribute('aria-valuetext', setting.format(setting.input.value));
+        if (setting.input.value !== setting.value) attributes.push(`${setting.name}="${escapeAttribute(setting.input.value)}"`);
+      }
+      code.textContent = baseSnippet.replace(/<dot-line\b[^>]*>/, () => `<dot-line ${attributes.join(' ')}>`);
+      for (const button of styleButtons) {
+        const preset = presets[button.dataset.stylePreset];
+        button.setAttribute('aria-pressed', String(Boolean(preset) && settings.every(setting => !Object.hasOwn(preset, setting.name) || setting.input.value === preset[setting.name])));
+      }
+    };
+    const show = (text, selected) => {
+      activeText = text;
+      buttons.forEach(button => button.setAttribute('aria-pressed', String(button === selected)));
+      update();
+    };
+    input.addEventListener('input', () => show(input.value, buttons.find(button => button.dataset.text === input.value)));
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const text = button.id === 'alphabet'
+        ? 'ABCDEFG\nHIJKLMN\nOPQRSTU\nVWXYZ\nabcdefg\nhijklmn\nopqrstu\nvwxyz'
+        : button.dataset.text;
+      input.value = button.id === 'alphabet' ? '' : text;
+      show(text, button);
+    }));
+    for (const setting of settings) setting.input.addEventListener(setting.event, update);
+    for (const button of styleButtons) button.addEventListener('click', () => {
+      const preset = presets[button.dataset.stylePreset];
+      if (!preset) return;
+      for (const setting of settings) if (Object.hasOwn(preset, setting.name)) setting.input.value = preset[setting.name];
+      update();
+    });
+    document.getElementById('reset').addEventListener('click', () => {
+      settings.forEach(setting => { setting.input.value = setting.value; });
+      input.value = 'Robot';
+      show('Robot', buttons.find(button => button.dataset.text === 'Robot'));
+    });
+    update();
+  </script>
+</body>
+</html>
